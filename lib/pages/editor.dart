@@ -3,7 +3,7 @@ import 'package:fuser/data/artkal-mini-c.dart';
 import 'package:fuser/models/rectangular-pattern.dart';
 import 'package:fuser/widgets/color-picker.dart';
 import 'package:fuser/widgets/rectangular-pegboard.dart';
-import 'package:vector_math/vector_math_64.dart' hide Colors, Vector2;
+import 'package:fuser/widgets/workspace.dart';
 
 class Editor extends StatefulWidget {
   Editor({Key key, @required this.pattern}) : super(key: key);
@@ -16,40 +16,11 @@ class Editor extends StatefulWidget {
 
 // @todo Lots of methods and state can be moved to SquarePegboard.
 class _EditorState extends State<Editor> {
-  Offset _offset = Offset(0, 0);
-  Offset _initialOffset = Offset(0, 0);
-  double _scale = 1.0;
-  double _initialScale;
-
   List<List<Color>> _colors;
   Color _selectedColor = artkalMiniC.swatches['C02'].color;
   bool _fused = false;
   List<Tool> _tools;
   Tool _selectedTool;
-
-  void _setOffset(Offset offset) {
-    setState(() {
-      _offset = offset;
-    });
-  }
-
-  void _setInitialOffset(Offset offset) {
-    setState(() {
-      _initialOffset = offset;
-    });
-  }
-
-  void _setScale(double scale) {
-    setState(() {
-      _scale = scale;
-    });
-  }
-
-  void _setInitialScale(double scale) {
-    setState(() {
-      _initialScale = scale;
-    });
-  }
 
   void _setFused(bool fused) {
     setState(() {
@@ -195,43 +166,14 @@ class _EditorState extends State<Editor> {
           ),
         ],
       ),
-      body: Container(
-        child: GestureDetector(
-          onScaleStart: (details) {
-            _setInitialScale(_scale);
-            _setInitialOffset(-_offset + details.focalPoint);
-          },
-          onScaleUpdate: (details) {
-            _setScale(_initialScale * details.scale);
-            _setOffset(-_initialOffset + details.focalPoint);
-          },
-          onScaleEnd: (details) {
-            _setInitialScale(null);
-          },
-          child: Container(
-            color: Color(0xffe5e5e5),
-            child: Transform(
-              transform: Matrix4.compose(
-                Vector3(_offset.dx, _offset.dy, 1.0),
-                Quaternion.identity(),
-                Vector3(_scale, _scale, 1.0),
-              ),
-              alignment: FractionalOffset.center,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: RectangularPegboard(
-                    width: widget.pattern.width,
-                    height: widget.pattern.height,
-                    colors: _colors,
-                    fused: _fused,
-                    onPegTap: _selectedTool.onPegTap,
-                    onPegLongPress: _selectedTool.onPegLongPress,
-                  ),
-                ),
-              ),
-            ),
-          ),
+      body: Workspace(
+        child: RectangularPegboard(
+          width: widget.pattern.width,
+          height: widget.pattern.height,
+          colors: _colors,
+          fused: _fused,
+          onPegTap: _selectedTool.onPegTap,
+          onPegLongPress: _selectedTool.onPegLongPress,
         ),
       ),
       bottomNavigationBar: BottomAppBar(
