@@ -43,9 +43,9 @@ class _EditorState extends State<Editor> {
 
   bool _onBoard(RectangularPosition position) {
     return position.row >= 0 &&
-        position.row < widget.pattern.width &&
+        position.row < widget.pattern.height &&
         position.column >= 0 &&
-        position.column < widget.pattern.height;
+        position.column < widget.pattern.width;
   }
 
   void _fillArea(RectangularPosition position, Color color) {
@@ -57,16 +57,15 @@ class _EditorState extends State<Editor> {
 
     while (options.length > 0) {
       RectangularPosition option = options.removeAt(0);
+
+      if (visited.contains(option)) continue;
       visited.add(option);
 
       if (!_onBoard(option)) continue;
 
       if (_getColor(option) == probe) {
         area.add(option);
-
-        option.getNeighbors().forEach((adjacent) {
-          if (!visited.contains(adjacent)) options.add(adjacent);
-        });
+        option.getNeighbors().forEach(options.add);
       }
     }
 

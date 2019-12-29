@@ -81,4 +81,9 @@ class RectangularPosition {
 
   @override
   int get hashCode => row.hashCode + column.hashCode;
+
+  @override
+  String toString() {
+    return 'RectangularPosition{row: $row, column: $column}';
+  }
 }
