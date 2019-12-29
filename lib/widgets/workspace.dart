@@ -11,8 +11,8 @@ class Workspace extends StatefulWidget {
 }
 
 class _WorkspaceState extends State<Workspace> {
-  Offset _translation = Offset(0, 0);
-  Offset _initialTranslation = Offset(0, 0);
+  Offset _translation = Offset(0.0, 0.0);
+  Offset _initialTranslation = Offset(0.0, 0.0);
   double _scale = 1.0;
   double _initialScale;
 
