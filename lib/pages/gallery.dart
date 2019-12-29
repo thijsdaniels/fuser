@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fuser/data/patterns/kirby.dart';
-import 'package:fuser/data/patterns/link.dart';
-import 'package:fuser/data/patterns/mario.dart';
-import 'package:fuser/data/patterns/pikachu.dart';
 import 'package:fuser/models/rectangular-pattern.dart';
 import 'package:fuser/widgets/rectangular-pegboard.dart';
 
@@ -18,7 +14,7 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   Future<List<RectangularPattern>> _futurePatterns = RectangularPattern.all();
 
-  bool _fused = true;
+  bool _fused = false;
 
   void _setFused(bool fused) {
     setState(() {
@@ -100,14 +96,11 @@ class _GalleryState extends State<Gallery> {
           builder: (context) => Editor(pattern: pattern),
         ),
       ),
-      leading: AspectRatio(
-        aspectRatio: 1,
-        child: RectangularPegboard(
-          width: pattern.width,
-          height: pattern.height,
-          fused: _fused,
-          colors: pattern.colors,
-        ),
+      leading: RectangularPegboard(
+        width: pattern.width,
+        height: pattern.height,
+        fused: _fused,
+        colors: pattern.colors,
       ),
       title: Text(pattern.name),
       subtitle: Text('${pattern.width} × ${pattern.height}'),

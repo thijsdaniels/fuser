@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 class Workspace extends StatefulWidget {
   final Widget child;
@@ -11,20 +11,20 @@ class Workspace extends StatefulWidget {
 }
 
 class _WorkspaceState extends State<Workspace> {
-  Offset _offset = Offset(0, 0);
-  Offset _initialOffset = Offset(0, 0);
+  Offset _translation = Offset(0, 0);
+  Offset _initialTranslation = Offset(0, 0);
   double _scale = 1.0;
   double _initialScale;
 
   void _setOffset(Offset offset) {
     setState(() {
-      _offset = offset;
+      _translation = offset;
     });
   }
 
   void _setInitialOffset(Offset offset) {
     setState(() {
-      _initialOffset = offset;
+      _initialTranslation = offset;
     });
   }
 
@@ -46,20 +46,20 @@ class _WorkspaceState extends State<Workspace> {
       child: GestureDetector(
         onScaleStart: (details) {
           _setInitialScale(_scale);
-          _setInitialOffset(-_offset + details.focalPoint);
+          _setInitialOffset(-_translation + details.focalPoint);
         },
         onScaleUpdate: (details) {
           _setScale(_initialScale * details.scale);
-          _setOffset(-_initialOffset + details.focalPoint);
+          _setOffset(-_initialTranslation + details.focalPoint);
         },
         onScaleEnd: (details) {
           _setInitialScale(null);
         },
         child: Container(
-          color: Color(0xffe5e5e5),
+          color: Colors.transparent,
           child: Transform(
             transform: Matrix4.compose(
-              Vector3(_offset.dx, _offset.dy, 1.0),
+              Vector3(_translation.dx, _translation.dy, 0.0),
               Quaternion.identity(),
               Vector3(_scale, _scale, 1.0),
             ),

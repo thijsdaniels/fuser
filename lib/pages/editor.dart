@@ -3,6 +3,7 @@ import 'package:fuser/data/artkal-mini-c.dart';
 import 'package:fuser/models/rectangular-pattern.dart';
 import 'package:fuser/widgets/color-picker.dart';
 import 'package:fuser/widgets/rectangular-pegboard.dart';
+import 'package:fuser/widgets/tool-bar.dart';
 import 'package:fuser/widgets/workspace.dart';
 
 class Editor extends StatefulWidget {
@@ -20,7 +21,9 @@ class _EditorState extends State<Editor> {
   Color _selectedColor = artkalMiniC.swatches['C02'].color;
   bool _fused = false;
   List<Tool> _tools;
-  Tool _selectedTool;
+  int _selectedToolIndex = 0;
+
+  Tool get _selectedTool => _tools[_selectedToolIndex];
 
   void _setFused(bool fused) {
     setState(() {
@@ -28,7 +31,11 @@ class _EditorState extends State<Editor> {
     });
   }
 
-  void _setPegColor(RectangularPosition position, Color color) {
+  Color _getColor(RectangularPosition position) {
+    return _colors[position.row][position.column];
+  }
+
+  void _setColor(RectangularPosition position, Color color) {
     setState(() {
       _colors[position.row][position.column] = color;
     });
@@ -42,7 +49,7 @@ class _EditorState extends State<Editor> {
   }
 
   void _fillArea(RectangularPosition position, Color color) {
-    Color probe = _colors[position.row][position.column];
+    Color probe = _getColor(position);
 
     List<RectangularPosition> options = [position];
     List<RectangularPosition> visited = [];
@@ -54,7 +61,7 @@ class _EditorState extends State<Editor> {
 
       if (!_onBoard(option)) continue;
 
-      if (_colors[option.row][option.column] == probe) {
+      if (_getColor(option) == probe) {
         area.add(option);
 
         option.getNeighbors().forEach((adjacent) {
@@ -76,9 +83,9 @@ class _EditorState extends State<Editor> {
     });
   }
 
-  void _setSelectedTool(Tool tool) {
+  void _setSelectedToolIndex(int index) {
     setState(() {
-      _selectedTool = tool;
+      _selectedToolIndex = index;
     });
   }
 
@@ -92,16 +99,16 @@ class _EditorState extends State<Editor> {
       Tool(
         icon: Icons.adjust,
         onPegTap: (position) {
-          _setPegColor(position, _selectedColor);
+          _setColor(position, _selectedColor);
         },
         onPegLongPress: (position) {
-          _setPegColor(position, Colors.transparent);
+          _setColor(position, Colors.transparent);
         },
       ),
       Tool(
         icon: Icons.clear,
         onPegTap: (position) {
-          _setPegColor(position, Colors.transparent);
+          _setColor(position, Colors.transparent);
         },
       ),
       Tool(
@@ -119,12 +126,10 @@ class _EditorState extends State<Editor> {
       Tool(
         icon: Icons.colorize,
         onPegTap: (position) {
-          _setSelectedColor(_colors[position.row][position.column]);
+          _setSelectedColor(_getColor(position));
         },
       ),
     ];
-
-    _selectedTool = _tools[0];
   }
 
   @override
@@ -176,27 +181,11 @@ class _EditorState extends State<Editor> {
           onPegLongPress: _selectedTool.onPegLongPress,
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        child: Padding(
-          // To make space for the FAB.
-          padding: const EdgeInsets.only(right: 80),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: _tools.map((tool) {
-              return IconButton(
-                icon: Icon(tool.icon),
-                disabledColor: Colors.grey.withOpacity(0.25),
-                color: tool == _selectedTool ? Colors.deepPurple : Colors.grey,
-                onPressed: tool.onPegTap != null || tool.onPegLongPress != null
-                    ? () {
-                        _setSelectedTool(tool);
-                      }
-                    : null,
-              );
-            }).toList(),
-          ),
-        ),
+      bottomNavigationBar: ToolBar(
+        tools: _tools,
+        selectedTool: _selectedToolIndex,
+        onSelect: _setSelectedToolIndex,
+        padding: const EdgeInsets.only(right: 80),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
@@ -229,12 +218,4 @@ class _EditorState extends State<Editor> {
       _setSelectedColor(selectedColor);
     }
   }
-}
-
-class Tool {
-  final IconData icon;
-  final Function(RectangularPosition) onPegTap;
-  final Function(RectangularPosition) onPegLongPress;
-
-  Tool({@required this.icon, this.onPegTap, this.onPegLongPress});
 }
