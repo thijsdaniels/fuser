@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:fuser/data/artkal-mini-c.dart';
+import 'package:fuser/models/palette.dart';
 import 'package:fuser/models/rectangular-pattern.dart';
-import 'package:fuser/widgets/color-picker.dart';
+import 'package:fuser/widgets/bead-count-list.dart';
+import 'package:fuser/widgets/bead-picker.dart';
 import 'package:fuser/widgets/rectangular-pegboard.dart';
+import 'package:fuser/widgets/titled.dart';
 import 'package:fuser/widgets/tool-bar.dart';
 import 'package:fuser/widgets/workspace.dart';
 
 class Editor extends StatefulWidget {
-  Editor({Key key, @required this.pattern}) : super(key: key);
-
   final RectangularPattern pattern;
+  final Palette palette;
+
+  Editor({
+    Key key,
+    @required this.pattern,
+    @required this.palette,
+  }) : super(key: key);
 
   @override
   _EditorState createState() => _EditorState();
@@ -17,13 +24,20 @@ class Editor extends StatefulWidget {
 
 // @todo Lots of methods and state can be moved to SquarePegboard.
 class _EditorState extends State<Editor> {
+  String _name;
   List<List<Color>> _colors;
-  Color _selectedColor = artkalMiniC.swatches['C02'].color;
+  Color _selectedColor;
   bool _fused = false;
   List<Tool> _tools;
   int _selectedToolIndex = 0;
 
   Tool get _selectedTool => _tools[_selectedToolIndex];
+
+  void _setName(String name) {
+    setState(() {
+      _name = name;
+    });
+  }
 
   void _setFused(bool fused) {
     setState(() {
@@ -76,6 +90,44 @@ class _EditorState extends State<Editor> {
     });
   }
 
+  void _replaceColor(RectangularPosition position, Color color) {
+    Color probe = _getColor(position);
+
+    setState(() {
+      _colors = _colors.map((row) {
+        return row.map((option) {
+          return option == probe ? color : option;
+        }).toList();
+      }).toList();
+    });
+  }
+
+  _shiftColors(Offset distance) {
+    for (int i = 0; i < distance.dy.abs(); i++) {
+      if (distance.dy < 0) {
+        _colors.insert(_colors.length, _colors.removeAt(0));
+      } else if (distance.dy > 0) {
+        _colors.insert(0, _colors.removeLast());
+      }
+    }
+
+    for (int i = 0; i < distance.dx.abs(); i++) {
+      if (distance.dx < 0) {
+        for (List<Color> row in _colors) {
+          row.insert(row.length, row.removeAt(0));
+        }
+      } else if (distance.dx > 0) {
+        for (List<Color> row in _colors) {
+          row.insert(0, row.removeLast());
+        }
+      }
+    }
+
+    setState(() {
+      _colors = _colors;
+    });
+  }
+
   void _setSelectedColor(Color color) {
     setState(() {
       _selectedColor = color;
@@ -92,7 +144,9 @@ class _EditorState extends State<Editor> {
   void initState() {
     super.initState();
 
-    _colors = widget.pattern.colors;
+    _name = '${widget.pattern.name}';
+    _colors = widget.pattern.copyColors();
+    _selectedColor = widget.palette.defaultBead.color;
 
     _tools = [
       Tool(
@@ -105,13 +159,10 @@ class _EditorState extends State<Editor> {
         },
       ),
       Tool(
-        icon: Icons.clear,
+        icon: Icons.not_interested,
         onPegTap: (position) {
           _setColor(position, Colors.transparent);
         },
-      ),
-      Tool(
-        icon: Icons.brush,
       ),
       Tool(
         icon: Icons.format_paint,
@@ -120,7 +171,15 @@ class _EditorState extends State<Editor> {
         },
       ),
       Tool(
-        icon: Icons.invert_colors,
+          icon: Icons.invert_colors,
+          onPegTap: (position) {
+            _replaceColor(position, _selectedColor);
+          }),
+      Tool(
+        icon: Icons.open_with,
+        onPegTap: (position) {
+          _shiftColors(Offset(1, 0));
+        },
       ),
       Tool(
         icon: Icons.colorize,
@@ -140,10 +199,14 @@ class _EditorState extends State<Editor> {
             border: InputBorder.none,
           ),
           style:
-              Theme.of(context).textTheme.title.copyWith(color: Colors.white),
-          initialValue: widget.pattern.name,
+          Theme
+              .of(context)
+              .textTheme
+              .title
+              .copyWith(color: Colors.white),
+          initialValue: _name,
           onChanged: (value) {
-            widget.pattern.name = value;
+            _setName(value);
           },
         ),
         actions: [
@@ -152,8 +215,8 @@ class _EditorState extends State<Editor> {
             onPressed: null,
           ),
           IconButton(
-            icon: Icon(Icons.redo),
-            onPressed: null,
+            icon: Icon(Icons.info),
+            onPressed: _showInfo,
           ),
           IconButton(
             icon: Icon(_fused ? Icons.visibility_off : Icons.visibility),
@@ -164,6 +227,8 @@ class _EditorState extends State<Editor> {
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () async {
+              widget.pattern.name = _name;
+              widget.pattern.colors = _colors;
               await widget.pattern.save();
               Navigator.of(context).pop();
             },
@@ -195,17 +260,37 @@ class _EditorState extends State<Editor> {
               ? Colors.black
               : Colors.white,
         ),
-        onPressed: _selectColor,
+        onPressed: () {
+          _selectColor(widget.palette);
+        },
       ),
     );
   }
 
-  Future<void> _selectColor() async {
+  Future<void> _showInfo() async {
+    await showDialog<Color>(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Titled(
+            title: 'Bead Count',
+            child: BeadCountList(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              palette: widget.palette,
+              colors: _colors.expand((i) => i).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _selectColor(Palette palette) async {
     Color selectedColor = await showDialog<Color>(
       context: context,
-      builder: (BuildContext context) {
-        return ColorPicker(
-          palette: artkalMiniC,
+      builder: (context) {
+        return BeadPicker(
+          palette: palette,
           onSelect: (swatch) {
             Navigator.pop(context, swatch.color);
           },

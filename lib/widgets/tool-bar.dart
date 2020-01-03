@@ -45,5 +45,9 @@ class Tool {
   final Function(RectangularPosition) onPegTap;
   final Function(RectangularPosition) onPegLongPress;
 
-  Tool({@required this.icon, this.onPegTap, this.onPegLongPress});
+  Tool({
+    @required this.icon,
+    @required this.onPegTap,
+    this.onPegLongPress,
+  });
 }

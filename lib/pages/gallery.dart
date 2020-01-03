@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fuser/data/palettes.dart';
 import 'package:fuser/models/rectangular-pattern.dart';
 import 'package:fuser/widgets/rectangular-pegboard.dart';
 
@@ -79,6 +80,7 @@ class _GalleryState extends State<Gallery> {
     List<RectangularPattern> patterns,
   ) {
     return ListView.separated(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 88.0),
       itemCount: patterns?.length ?? 0,
       itemBuilder: (context, index) {
         return _buildPatternItem(context, patterns[index]);
@@ -93,7 +95,10 @@ class _GalleryState extends State<Gallery> {
     return ListTile(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => Editor(pattern: pattern),
+          builder: (context) => Editor(
+            pattern: pattern,
+            palette: Palettes.artkalMiniC, // @todo Get palette from pattern?
+          ),
         ),
       ),
       leading: RectangularPegboard(
@@ -155,6 +160,7 @@ class _GalleryState extends State<Gallery> {
               width: size,
               height: size,
             ),
+            palette: Palettes.artkalMiniC,
           ),
         ),
       );

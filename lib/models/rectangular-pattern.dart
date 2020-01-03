@@ -6,28 +6,33 @@ import 'package:sqflite/sqflite.dart';
 
 import 'pattern.dart';
 
-class RectangularPattern extends Pattern {
+class RectangularPattern extends Pattern<List<List<Color>>> {
   final int width;
   final int height;
-  List<List<Color>> colors;
 
   /// @todo Assert that the provided colors have the correct length.
   RectangularPattern({
     id,
     @required name,
+    colors,
     @required this.width,
     @required this.height,
-    this.colors,
-  }) : super(id: id, name: name) {
-    if (colors == null) {
-      colors = List.generate(
-        height,
-        (row) => List.generate(
-          width,
-          (column) => Colors.transparent,
-        ),
-      );
-    }
+  }) : super(id: id, name: name, colors: colors);
+
+  @override
+  List<List<Color>> initializeColors() {
+    return List.generate(height, (row) {
+      return List.generate(width, (column) {
+        return Colors.transparent;
+      });
+    });
+  }
+
+  @override
+  List<List<Color>> copyColors() {
+    return List.from(colors.map<List<Color>>((row) {
+      return List.from(row);
+    }));
   }
 
   @override

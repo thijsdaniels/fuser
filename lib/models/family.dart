@@ -1,6 +1,11 @@
+import 'package:flutter/material.dart';
+
 class Family {
   final String name;
-  final List<String> swatches;
+  final List<String> beadCodes;
 
-  const Family({this.name, this.swatches});
+  const Family({
+    @required this.name,
+    @required this.beadCodes,
+  });
 }
