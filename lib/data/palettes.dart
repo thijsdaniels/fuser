@@ -440,8 +440,8 @@ class Palettes {
       ),
       const Bead(
         code: 'C87',
-        name: 'Ghost While',
-        color: ArtkalColors.ghostWhile,
+        name: 'Ghost White',
+        color: ArtkalColors.ghostWhite,
       ),
       const Bead(
         code: 'C88',

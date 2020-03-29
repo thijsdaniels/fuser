@@ -199,11 +199,7 @@ class _EditorState extends State<Editor> {
             border: InputBorder.none,
           ),
           style:
-          Theme
-              .of(context)
-              .textTheme
-              .title
-              .copyWith(color: Colors.white),
+              Theme.of(context).textTheme.title.copyWith(color: Colors.white),
           initialValue: _name,
           onChanged: (value) {
             _setName(value);
@@ -236,14 +232,20 @@ class _EditorState extends State<Editor> {
         ],
       ),
       body: Workspace(
-        child: RectangularPegboard(
-          width: widget.pattern.width,
-          height: widget.pattern.height,
-          colors: _colors,
-          fused: _fused,
-          onPegTap: _selectedTool.onPegTap,
-          onPegLongPress: _selectedTool.onPegLongPress,
-        ),
+        builder: (context, key) {
+          return Hero(
+            tag: 'pegboard-${widget.pattern.id}',
+            child: RectangularPegboard(
+              key: key,
+              width: widget.pattern.width,
+              height: widget.pattern.height,
+              colors: _colors,
+              fused: _fused,
+              onPegTap: _selectedTool.onPegTap,
+              onPegLongPress: _selectedTool.onPegLongPress,
+            ),
+          );
+        },
       ),
       bottomNavigationBar: ToolBar(
         tools: _tools,

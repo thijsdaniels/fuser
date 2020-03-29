@@ -1,9 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fuser/data/palettes.dart';
 import 'package:fuser/models/rectangular-pattern.dart';
+import 'package:fuser/pages/pattern-details.dart';
 import 'package:fuser/widgets/rectangular-pegboard.dart';
 
 import 'editor.dart';
+
+enum PatternAction {
+  edit,
+  duplicate,
+  delete,
+}
 
 class Gallery extends StatefulWidget {
   Gallery({Key key}) : super(key: key);
@@ -15,7 +23,7 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   Future<List<RectangularPattern>> _futurePatterns = RectangularPattern.all();
 
-  bool _fused = false;
+  bool _fused = true;
 
   void _setFused(bool fused) {
     setState(() {
@@ -69,7 +77,7 @@ class _GalleryState extends State<Gallery> {
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
-          onPressed: _newPattern,
+          onPressed: _create,
         ),
       ),
     );
@@ -93,45 +101,81 @@ class _GalleryState extends State<Gallery> {
 
   Widget _buildPatternItem(BuildContext context, RectangularPattern pattern) {
     return ListTile(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Editor(
-            pattern: pattern,
-            palette: Palettes.artkalMiniC, // @todo Get palette from pattern?
+      onTap: () {
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) {
+              return PatternDetails(
+                pattern: pattern,
+              );
+            },
           ),
+        );
+      },
+      leading: Hero(
+        tag: 'pegboard-${pattern.id}',
+        child: RectangularPegboard(
+          width: pattern.width,
+          height: pattern.height,
+          fused: _fused,
+          colors: pattern.colors,
         ),
-      ),
-      leading: RectangularPegboard(
-        width: pattern.width,
-        height: pattern.height,
-        fused: _fused,
-        colors: pattern.colors,
       ),
       title: Text(pattern.name),
       subtitle: Text('${pattern.width} × ${pattern.height}'),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: Icon(Icons.content_copy),
-            onPressed: () async {
-              await pattern.copyWith(name: '${pattern.name} (Copy)').save();
-              _refresh();
-            },
+      trailing: PopupMenuButton<PatternAction>(
+        onSelected: (PatternAction result) async {
+          switch(result) {
+            case PatternAction.edit:
+              return _edit(context, pattern);
+            case PatternAction.duplicate:
+              return _duplicate(pattern);
+            case PatternAction.delete:
+              return _delete(pattern);
+          }
+        },
+        itemBuilder: (BuildContext context) => [
+          const PopupMenuItem<PatternAction>(
+            value: PatternAction.edit,
+            child: Text('Edit'),
           ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () async {
-              await pattern.delete();
-              _refresh();
-            },
+          const PopupMenuItem<PatternAction>(
+            value: PatternAction.duplicate,
+            child: Text('Duplicate'),
+          ),
+          const PopupMenuItem<PatternAction>(
+            value: PatternAction.delete,
+            child: Text('Delete'),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _newPattern() async {
+  void _edit(BuildContext context, RectangularPattern pattern) {
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) {
+          return Editor(
+            pattern: pattern,
+            palette: Palettes.artkalMiniC, // @todo Get palette from pattern?
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _duplicate(RectangularPattern pattern) async {
+    await pattern.copyWith(name: '${pattern.name} (Copy)').save();
+    _refresh();
+  }
+
+  Future<void> _delete(RectangularPattern pattern) async {
+    await pattern.delete();
+    _refresh();
+  }
+
+  Future<void> _create() async {
     int size = await showDialog<int>(
       context: context,
       builder: (BuildContext context) {
@@ -153,7 +197,7 @@ class _GalleryState extends State<Gallery> {
 
     if (size != null) {
       Navigator.of(context).push(
-        MaterialPageRoute(
+        CupertinoPageRoute(
           builder: (context) => Editor(
             pattern: RectangularPattern(
               name: 'Untitled',

@@ -83,7 +83,7 @@ RectangularPattern link = RectangularPattern(
       ArtkalColors.clay,
       Colors.transparent,
       Colors.transparent,
-      ArtkalColors.brown,
+      ArtkalColors.lightBrown,
       Colors.transparent,
       Colors.transparent,
     ]

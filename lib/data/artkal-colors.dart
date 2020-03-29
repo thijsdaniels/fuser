@@ -87,7 +87,7 @@ class ArtkalColors {
   static const Color darkAlgae = const Color.fromARGB(255, 155, 188, 17);
   static const Color darkOlive = const Color.fromARGB(255, 153, 155, 48);
   static const Color jadeGreen = const Color.fromARGB(255, 0, 133, 34);
-  static const Color ghostWhile = const Color.fromARGB(255, 239, 239, 239);
+  static const Color ghostWhite = const Color.fromARGB(255, 239, 239, 239);
   static const Color ashGrey = const Color.fromARGB(255, 209, 209, 209);
   static const Color lightGray = const Color.fromARGB(255, 187, 188, 188);
   static const Color charcoalGray = const Color.fromARGB(255, 77, 77, 77);

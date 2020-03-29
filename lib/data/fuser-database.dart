@@ -2,6 +2,7 @@ import 'package:fuser/data/patterns/kirby.dart';
 import 'package:fuser/data/patterns/link.dart';
 import 'package:fuser/data/patterns/mario.dart';
 import 'package:fuser/data/patterns/pikachu.dart';
+import 'package:fuser/data/patterns/yoshi.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -47,9 +48,7 @@ class FuserDatabase {
       )
     ''');
 
-    await database.insert('rectangularPatterns', mario.toMap());
-    await database.insert('rectangularPatterns', link.toMap());
     await database.insert('rectangularPatterns', pikachu.toMap());
-    await database.insert('rectangularPatterns', kirby.toMap());
+    await database.insert('rectangularPatterns', yoshi.toMap());
   }
 }

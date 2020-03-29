@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
       title: 'Fuser',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
-        scaffoldBackgroundColor: Color(0xffeaeaea),
       ),
       home: Gallery(),
     );

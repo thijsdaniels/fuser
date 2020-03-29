@@ -13,6 +13,7 @@ class RectangularPegboard extends Pegboard {
   final Function(RectangularPosition) onPegLongPress;
 
   const RectangularPegboard({
+    Key key,
     this.gridSpacing = 15,
     @required this.width,
     @required this.height,
@@ -21,6 +22,7 @@ class RectangularPegboard extends Pegboard {
     this.onPegTap,
     this.onPegLongPress,
   }) : super(
+          key: key,
           fused: fused,
           onPegTap: onPegTap,
           onPegLongPress: onPegLongPress,

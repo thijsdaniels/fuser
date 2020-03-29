@@ -69,7 +69,7 @@ RectangularPattern pikachu = RectangularPattern(
     ],
     [
       Colors.transparent,
-      ArtkalColors.corn,
+      ArtkalColors.clay,
       ArtkalColors.canary,
       ArtkalColors.corn,
       ArtkalColors.canary,
@@ -82,8 +82,8 @@ RectangularPattern pikachu = RectangularPattern(
       Colors.transparent,
       ArtkalColors.canary,
       ArtkalColors.corn,
-      ArtkalColors.clay,
-      ArtkalColors.clay,
+      ArtkalColors.corn,
+      ArtkalColors.corn,
       ArtkalColors.corn,
       Colors.transparent,
     ]

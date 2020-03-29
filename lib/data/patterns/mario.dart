@@ -84,7 +84,7 @@ RectangularPattern mario = RectangularPattern(
       Colors.transparent,
       Colors.transparent,
       Colors.transparent,
-      ArtkalColors.brown,
+      ArtkalColors.lightBrown,
       Colors.transparent,
     ]
   ],

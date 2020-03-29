@@ -7,8 +7,9 @@ abstract class Pegboard extends StatelessWidget {
   final Function onPegLongPress;
 
   const Pegboard({
+    Key key,
     @required this.fused,
     this.onPegTap,
     this.onPegLongPress,
-  });
+  }) : super(key: key);
 }
